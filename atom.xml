@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>AT Blog</title>
+  
+  <subtitle>AT&#39;s own space</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://http://blog.threadblocked.com/"/>
+  <updated>2019-03-31T08:29:09.723Z</updated>
+  <id>http://http://blog.threadblocked.com/</id>
+  
+  <author>
+    <name>Arthur Tsang</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ffmpeg-zoompan</title>
+    <link href="http://http://blog.threadblocked.com/2019/03/31/ffmpeg-zoompan/"/>
+    <id>http://http://blog.threadblocked.com/2019/03/31/ffmpeg-zoompan/</id>
+    <published>2019-03-31T08:20:15.000Z</published>
+    <updated>2019-03-31T08:29:09.723Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="zoompan滤镜"><a href="#zoompan滤镜" class="headerlink" title="zoompan滤镜"></a>zoompan滤镜</h2><p>放大和摇镜头，此滤镜在zoom的时候会有抖动的瑕疵，有一个土方法是先放大几倍，然后再在zoompan的s参数生成想要的分辨率</p><p>接受以下几个常用参数：</p><ul><li><p>zoom,z 放大系数表达式</p></li><li><p>x,y 表达式，默认为0，结合s参数使用来获取想要的放大后的部分</p></li><li><p>s 输出图像尺寸</p></li><li><p>d 持续帧数</p><p>每个表达式都可以接受以下参数</p><ol><li>iw,ih 输入的宽高</li><li>ow,oh 输出的宽高</li><li>in,on 输入输出帧计数</li><li>x,y 最后计算的x和y对于当前输入帧的x和y表达式。</li><li>zoom 当前输入帧对应的最后z表达式计算得出的放大系数</li></ol></li></ul><h2 id="demos"><a href="#demos" class="headerlink" title="demos"></a>demos</h2><ol><li><p>放大到1.5，屏幕中心不变，持续50帧</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zoompan=zoom+0.01:x=(iw-iw/zoom)/2:y=(ih-ih/zoom)/2:s=1280x720:d=50</span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/HFrOBVKuXIo" frameborder="0" allowfullscreen></iframe></div></li><li><p>放大到1.5，持续50帧，然后向右平移</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zoompan=<span class="string">'min(zoom+0.01,1.5)'</span>:x=<span class="string">'if(lte(on,50),(iw-iw/zoom)/2,x+10)'</span>:y=<span class="string">'if(lte(on,50),(ih-ih/zoom)/2,y)'</span>:s=1280x720:d=250</span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/Xglgx4eSQdQ" frameborder="0" allowfullscreen></iframe></div></li><li><p>先放大到1.5，然后慢慢缩小</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zoompan=<span class="string">'if(eq(on,1),1.5,zoom-0.002)'</span>:x=<span class="string">'(iw-iw/zoom)/2'</span>:y=<span class="string">'(ih-ih/zoom)/2'</span>:s=1280x720:d=250</span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/_g2KLeTIh-c" frameborder="0" allowfullscreen></iframe></div></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;zoompan滤镜&quot;&gt;&lt;a href=&quot;#zoompan滤镜&quot; class=&quot;headerlink&quot; title=&quot;zoompan滤镜&quot;&gt;&lt;/a&gt;zoompan滤镜&lt;/h2&gt;&lt;p&gt;放大和摇镜头，此滤镜在zoom的时候会有抖动的瑕疵，有一个土方法是先放大几倍，然后再
+      
+    
+    </summary>
+    
+      <category term="ffmpeg" scheme="http://http://blog.threadblocked.com/categories/ffmpeg/"/>
+    
+    
+      <category term="zoompan" scheme="http://http://blog.threadblocked.com/tags/zoompan/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ffmpeg-blend</title>
+    <link href="http://http://blog.threadblocked.com/2019/03/31/ffmpeg-blend/"/>
+    <id>http://http://blog.threadblocked.com/2019/03/31/ffmpeg-blend/</id>
+    <published>2019-03-31T08:15:49.000Z</published>
+    <updated>2019-03-31T08:28:43.850Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="blend滤镜"><a href="#blend滤镜" class="headerlink" title="blend滤镜"></a>blend滤镜</h2><p>混合两个视频帧</p><p>混合两路输出1路流，第一个输入为top层(A)，二个路为bottom层(B)，输出以输入短的为结束。</p><p>最常用的模式</p><pre><code> 1. all_mode:normal,然后用all_expr来确定怎么显示A和B。有以下几个重要参数 + N，帧序数，从0开始 + X，Y 像素坐标 + W，H 原始视频宽高 + T 当前帧时间 + A top层 + B bottom层2. allmode:overlay 然后利用 all_opacity 来设置透明度</code></pre><h2 id="demos"><a href="#demos" class="headerlink" title="demos"></a>demos</h2><ol><li><p>翻页效果，从右下角望左上角翻页</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">blend=all_expr=<span class="string">'if(gte(X+Y,(W+H)*(1-T/2)),A,B)'</span></span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/Ez8kVxl6JUk" frameborder="0" allowfullscreen></iframe></div></li><li><p>overlay with opacity</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[v0][v1]blend=all_mode=overlay:all_opacity=0.7,format=yuv420p[v]</span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/7q8DBRvDxso" frameborder="0" allowfullscreen></iframe></div></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;blend滤镜&quot;&gt;&lt;a href=&quot;#blend滤镜&quot; class=&quot;headerlink&quot; title=&quot;blend滤镜&quot;&gt;&lt;/a&gt;blend滤镜&lt;/h2&gt;&lt;p&gt;混合两个视频帧&lt;/p&gt;
+&lt;p&gt;混合两路输出1路流，第一个输入为top层(A)，二个路为bottom层
+      
+    
+    </summary>
+    
+      <category term="ffmpeg" scheme="http://http://blog.threadblocked.com/categories/ffmpeg/"/>
+    
+    
+      <category term="blend" scheme="http://http://blog.threadblocked.com/tags/blend/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ffmpeg-drawtext</title>
+    <link href="http://http://blog.threadblocked.com/2019/03/31/ffmpeg-drawtext/"/>
+    <id>http://http://blog.threadblocked.com/2019/03/31/ffmpeg-drawtext/</id>
+    <published>2019-03-31T07:58:48.000Z</published>
+    <updated>2019-03-31T08:28:56.761Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="drawtext滤镜"><a href="#drawtext滤镜" class="headerlink" title="drawtext滤镜"></a>drawtext滤镜</h2><p>就是在屏幕中绘制文字，有以下几个重要的参数：</p><ul><li>expansion 文本扩展模式，默认normal</li><li>fontcolor 字体的颜色</li><li>fontcolor_expr 在expansion为normal的模式下，可以接受表达式，动态改变字体颜色，有以下函数<ul><li>expr,e 它必须有一个参数来计算，接受计算x和y相同的常数和函数。注意并不是所有的常数都适合，例如text_w和text_h在此时还是一个未定义值（因为这两个值依赖于这里计算结果）</li><li>expr_int_format, eif 把表达式求值和输出格式化为整数。第一个参数是用于计算的表达式，就像是expr函数（包括了变量/常量等），第二个参数指定输出格式，允许‘x’, ‘X’, ‘d’ 和 ‘u’，其意义同于printf函数（C语言）中的意义。第三个参数是可选的，用来设置格式化为固定位数，左边可以用0来填补。</li><li>fontsize 字体大小</li></ul></li><li>fontsize 字体大小</li><li>start_number 起始帧数，默认为0</li><li>text 文本内容，同样在expansion为normal的模式下，接受表达式</li><li>x,y 文本绘制区域的坐标偏移。是相对于图像top/left的值,接受表达式,有下面的常量或函数<ul><li>line_h,lh 文本行高</li><li>main_h,h,H 输入的高</li><li>main_w,w,W 输入的宽</li><li>n 输入帧计数，从0开始</li><li>t 以秒为单位的时间计数</li><li>text_h,th 文本高</li><li>text_w,tw 文本宽</li></ul></li></ul><h2 id="demos"><a href="#demos" class="headerlink" title="demos"></a>demos</h2><ol><li><p>在视频下方中部显示字幕</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -y -loop 1  -t 10  -i a.png -c:v libx264 -vf <span class="string">"drawtext=text='This is a test':x=(w-tw)/2:y=3*(h-th)/4:fontsize=40:fontcolor=red:fontfile=SFMono-Regular.otf"</span> -r 25  output1.mp4</span><br></pre></td></tr></table></figure><img src="/2019/03/31/ffmpeg-drawtext/post_1_1.jpg"></li><li><p>移动字幕,从左边开始，每帧向右移动10个px</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drawtext=text=<span class="string">'This is a test'</span>:x=-tw+10*n:y=3*(h-th)/4:fontsize=40:fontcolor=red</span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/Mbcs78lk2SE" frameborder="0" allowfullscreen></iframe></div></li><li><p>旋转字幕</p><p>单单一个滤镜是不支持旋转的。所以做法是取两个视频层，A层自身旋转，然后叠加到B层上面</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-filter_complex <span class="string">"\</span></span><br><span class="line"><span class="string">color=black:320x320,split[text][alpha];\</span></span><br><span class="line"><span class="string">[text][alpha]alphamerge,setsar=1,drawtext=text='ROTATE':fontcolor=#ff0000:fontsize=40,rotate=3*PI/8-15*PI*t/36:ow='min(iw,ih)*sqrt(2)':oh=ow:c=black@0[txta];\</span></span><br><span class="line"><span class="string">[0:v]scale=1280x720,setdar=16/9[v0];\</span></span><br><span class="line"><span class="string">[v0][txta]overlay=x=580:y=300:shortest=1[v1];\</span></span><br><span class="line"><span class="string">[v1]format=yuv420p[v]"</span> \</span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/LVLiLJ-q8Mg" frameborder="0" allowfullscreen></iframe></div></li><li><p>字幕渐变效果，动态颜色</p><p>text参数和fontcolor_expr 都是可以接受表达式的，从表达式来实现动态效果</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#改变透明度</span></span><br><span class="line">drawtext=text=<span class="string">'ROTATE'</span>:fontcolor_expr=<span class="comment">#ff0000@0.%&#123;eif\\\\:if(gte(n\\,90)\\,99\\,10+n)\\\\:d\\\\:2&#125;:fontsize=60:x='(w-tw)/2':y='3*(h-th)/4'</span></span><br><span class="line"><span class="comment">#改变颜色</span></span><br><span class="line">drawtext=text=<span class="string">'This is A Test,color\:ffff'</span>%&#123;eif\\\\:mod(10+2*n*n\\,255)\\\\:x\\\\:2&#125;:fontcolor_expr=<span class="comment">#ffff%&#123;eif\\\\:mod(10+2*n*n\\,255)\\\\:x\\\\:2&#125;:fontsize=60:x='(w-tw)/2':y='3*(h-th)/4'</span></span><br></pre></td></tr></table></figure><div class="video-container"><iframe src="//www.youtube.com/embed/yRtepTHasB4" frameborder="0" allowfullscreen></iframe></div></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;drawtext滤镜&quot;&gt;&lt;a href=&quot;#drawtext滤镜&quot; class=&quot;headerlink&quot; title=&quot;drawtext滤镜&quot;&gt;&lt;/a&gt;drawtext滤镜&lt;/h2&gt;&lt;p&gt;就是在屏幕中绘制文字，有以下几个重要的参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ex
+      
+    
+    </summary>
+    
+      <category term="ffmpeg" scheme="http://http://blog.threadblocked.com/categories/ffmpeg/"/>
+    
+    
+      <category term="drawtext" scheme="http://http://blog.threadblocked.com/tags/drawtext/"/>
+    
+  </entry>
+  
+</feed>
